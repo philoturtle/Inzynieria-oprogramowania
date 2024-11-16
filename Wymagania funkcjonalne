@@ -1,0 +1,30 @@
+1. Rejestracja i logowanie użytkownika
+   - Użytkownik może się zarejestrować podając unikalny adres e-mail i hasło.
+   - Użytkownik może się zalogować, podając poprawne dane
+   - Użytkownik może zresetować swoje hasło, jeśli go zapomni.
+
+2. Dodawanie zeskanowanego paragonu
+   - Użytkownik może przesłać zdjęcie/skan paragonu do systemu.
+   - Aplikacja analizuje paragon i automatycznie wykrywa poszczególne produkty oraz ich ceny.
+   - Wydatki są odpowiednio kategoryzowane (np. jedzenie, transport, rozrywka) na podstawie analizy tekstu.
+   - Kwoty są sumowane dla każdego paragonu, a także dla danego miesiąca.
+
+3. Manualne dodawanie wydatków
+   - Użytkownik może ręcznie dodać wydatek w przypadku, gdy skanowanie paragonu nie jest możliwe.
+   - Użytkownik wybiera kategorię oraz kwotę wydatku.
+
+4. Zarządzanie budżetem
+   - Użytkownik może ustawić miesięczny budżet dla każdej kategorii wydatków.
+   - System pokazuje użytkownikowi, ile pieniędzy pozostało do wydania w danej kategorii na bieżący miesiąc.
+
+5. Prognozowanie wydatków
+   - Aplikacja generuje prognozy wydatków na kolejne miesiące na podstawie poprzednich wydatków użytkownika.
+   - Użytkownik może zobaczyć, jak jego wydatki prawdopodobnie rozłożą się w różnych kategoriach.
+
+6. Raporty finansowe
+   - Użytkownik może wygenerować raport za wybrany okres (np. miesiąc, rok) w postaci wykresów oraz tabeli.
+   - System przedstawia dane o wydatkach w postaci wykresów kołowych (wydatki według kategorii) oraz liniowych (wydatki w czasie).
+
+7. Notyfikacje
+   - System wysyła powiadomienia do użytkownika, jeśli zbliża się do limitu wydatków w danej kategorii.
+   - System przypomina o miesięcznych prognozach i przekroczeniach budżetu.
