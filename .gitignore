@@ -164,3 +164,7 @@ cython_debug/
 # project specific
 to_delete/
 alembic/
+
+images/
+*.jpg
+*.png
