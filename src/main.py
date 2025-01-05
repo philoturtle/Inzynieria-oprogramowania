@@ -1,35 +1,27 @@
-import os
-import random
-from typing import Annotated
-
-from fastapi import (
-    FastAPI,
-    File,
-    Form,
-    HTTPException,
-    Request,
-    UploadFile,
-)
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from mongoengine import connect
-from pydantic import BaseModel
-
-from controllers.receipt import ReceiptController
-from controllers.session import SessionController
-from controllers.user import UserController
-from models.requests import ReceiptRequest
-
 import base64
 import io
+import os
+import random
 from datetime import datetime
+from typing import Annotated
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from mongoengine import connect
+
+from controllers import ReceiptController, SessionController, UserController
+from models.requests import ReceiptRequest
 
 app = FastAPI()
+
+user_controller = UserController()
+session_controller = SessionController()
+receipt_controller = ReceiptController()
 
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/images", StaticFiles(directory="images"), name="images")
@@ -48,35 +40,31 @@ def read_root():
 
 @app.post("/login")
 def login(username: str, password: str):
-    sc = SessionController()
-    uc = UserController()
-    user = uc.login(username, password)
+    user = user_controller.login(username, password)
     if not user:
         return {"message": "Wrong"}
 
-    session = sc.create_session(user=user)
+    session = session_controller.create_session(user=user)
     return {"message": "Logged in successfully", "session_id": str(session.id)}
 
 
 @app.get("/user/{id}")
 def read_item(id: str):
     uc = UserController()
-    user = uc.find(id)
+    user = user_controller.find(id)
     print(user)
     return user.to_json()
 
 
 @app.post("/user/")
 def create_user(username: str, email: str, password: str, full_name: str = ""):
-    uc = UserController()
-    uc.create(email=email, username=username, full_name=full_name, password=password)
+    user_controller.create(email=email, username=username, full_name=full_name, password=password)
     return True
 
 
 @app.delete("/user/{id}")
 def delete_user(id: str):
-    uc = UserController()
-    uc.delete(id)
+    user_controller.delete(id)
     return {"message": f"Succesfully deleted user"}
 
 
@@ -84,10 +72,9 @@ def delete_user(id: str):
 async def upload_image(
     session_id: Annotated[str, Form()], img_file: Annotated[UploadFile, File()]
 ):
-    sc = SessionController()
-    # if not sc.is_active(session_id=session_id):
+    # if not session_controller.is_active(session_id=session_id):
     #     raise HTTPException(status_code=401, detail="Your session is expired.")
-    user = sc.get_user(session_id)
+    user = session_controller.get_user(session_id)
     rc = ReceiptController()
 
     file_size = len(await img_file.read())
@@ -101,9 +88,8 @@ async def upload_image(
         raise HTTPException(
             status_code=400, detail="Invalid file type. Only JPEG and PNG are allowed."
         )
-    receipt = rc.save_receipt_to_db_from_img(img_file.file)
-    uc = UserController()
-    uc.link_receipt(user.id, receipt)
+    receipt = receipt_controller.save_receipt_to_db_from_img(img_file.file)
+    user_controller.link_receipt(user.id, receipt)
     id = receipt.id
     extension = img_file.filename.split(".")[-1]
 
@@ -120,22 +106,19 @@ async def upload_image(
 
 @app.get("/receipt/{id}")
 def read_item(id: str):
-    rc = ReceiptController()
-    receipt = rc.find(id)
+    receipt = receipt_controller.find(id)
     return receipt.to_json()
 
 
 @app.delete("/receipt/{id}")
 def delete_receipt(id: str):
-    rc = ReceiptController()
-    rc.delete(id)
+    receipt_controller.delete(id)
     return {"message": f"Succesfully deleted receipt"}
 
 
 @app.get("/view/receipt/{id}", response_class=HTMLResponse)
 def view_receipt(request: Request, id: str):
-    rc = ReceiptController()
-    receipt = rc.find(id)
+    receipt = receipt_controller.find(id)
     return templates.TemplateResponse(
         request=request, name="receipt.html", context={"receipt": receipt}
     )
@@ -149,8 +132,7 @@ def list_user_receipts(
     month: str = "",
     day: str = "",
 ):
-    uc = UserController()
-    user = uc.find(user_id)
+    user = user_controller.find(user_id)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -251,12 +233,9 @@ def list_user_receipts(
     )
 
 
-
-
 @app.post("/add-expense")
 def add_expense(request: ReceiptRequest):
-    uc = UserController()
-    user = uc.find(request.user_id)
+    user = user_controller.find(request.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -271,8 +250,7 @@ def add_expense(request: ReceiptRequest):
         "currency": "USD",
     }
 
-    rc = ReceiptController()
-    new_receipt = rc.save_receipt_to_db_from_dict(receipt)
-    uc.link_receipt(user.id, new_receipt)
+    new_receipt = receipt_controller.save_receipt_to_db_from_dict(receipt)
+    user_controller.link_receipt(user.id, new_receipt)
 
     return {"message": "Expense added successfully!"}
