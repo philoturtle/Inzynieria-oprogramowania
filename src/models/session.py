@@ -1,6 +1,9 @@
-from mongoengine import Document, ReferenceField, DateTimeField
-from models.user import User
 from datetime import datetime, timedelta
+
+from mongoengine import DateTimeField, Document, ReferenceField
+
+from models.user import User
+
 
 class Session(Document):
     user = ReferenceField(User)
