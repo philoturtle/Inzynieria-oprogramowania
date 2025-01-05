@@ -25,7 +25,7 @@ receipt_controller = ReceiptController()
 app.mount("/images", StaticFiles(directory="images"), name="images")
 templates = Jinja2Templates(directory="templates")
 
-connect("appdb", host="mongodb://localhost", port=27020)
+connect("appdb", host="mongo", username="root", password="pass", port=27017, authentication_source='admin')
 
 
 MAX_FILE_SIZE = 500 * 1024
@@ -59,7 +59,7 @@ def create_user(username: str, email: str, password: str, full_name: str = ""):
     user = user_controller.create(
         email=email, username=username, full_name=full_name, password=password
     )
-    return {"message": f"Succesfully created user", "user_id": user.id}
+    return {"message": f"Succesfully created user", "user_id": str(user.id)}
 
 
 @app.delete("/user/{id}")
@@ -98,7 +98,7 @@ async def upload_image(
 
     return {
         "message": "Image saved successfully",
-        "receipt_id": receipt.id,
+        "receipt_id": str(receipt.id),
     }
 
 
@@ -150,6 +150,7 @@ def list_user_receipts(
             filtered_receipts.append(receipt)
     receipts = filtered_receipts
 
+    yearly_plot = monthly_plot = daily_plot = None
     if receipts:
         # Prepare data for plotting
         data = [
@@ -208,10 +209,6 @@ def list_user_receipts(
             daily_plot = base64.b64encode(iobytes.read()).decode()
             plt.close()
 
-    else:
-        # If no receipts, set paths to None
-        yearly_plot = monthly_plot = daily_plot = None
-
     return templates.TemplateResponse(
         "receipts_list.html",
         {
@@ -221,7 +218,7 @@ def list_user_receipts(
             "year": year,
             "month": month,
             "day": day,
-            "yearly_plot": yearly_plot,
+            "yearly_plot": None,
             "monthly_plot": monthly_plot,
             "daily_plot": daily_plot,
         },
@@ -248,4 +245,4 @@ def add_expense(request: ReceiptRequest):
     new_receipt = receipt_controller.save_receipt_to_db_from_dict(receipt)
     user_controller.link_receipt(user.id, new_receipt)
 
-    return {"message": "Expense added successfully!", "receipt_id": new_receipt.id}
+    return {"message": "Expense added successfully!", "receipt_id": str(new_receipt.id)}
