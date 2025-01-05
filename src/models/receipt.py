@@ -3,8 +3,8 @@ from datetime import datetime
 
 class Receipt(Document):
     receipt_number = StringField(required=True)
-    purchase_date = DateTimeField(default=datetime.utcnow)
-    products = ListField(DictField())  # e.g., [{"name": "WING PLATE", "price": 3.98}]
+    purchase_date = DateTimeField(default=datetime.now())
+    products = ListField(DictField())  
     total_amount = FloatField()
     currency = StringField()
-    #user = me.ReferenceField(User, required=True)
+ 
