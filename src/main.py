@@ -1,21 +1,16 @@
 import os
 import random
-from typing import Annotated, Dict, List
+from typing import Annotated
 
 from fastapi import (
-    APIRouter,
-    Body,
-    Depends,
     FastAPI,
     File,
     Form,
     HTTPException,
     Request,
     UploadFile,
-    status,
 )
 from fastapi.responses import HTMLResponse
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from mongoengine import connect
@@ -24,22 +19,15 @@ from pydantic import BaseModel
 from controllers.receipt import ReceiptController
 from controllers.session import SessionController
 from controllers.user import UserController
-
-
-class ReceiptRequest(BaseModel):
-    session_id: Annotated[str, Form()]
-    img_file: Annotated[UploadFile, File()] = File(...)
-
+from models.requests import ReceiptRequest
 
 import base64
-import calendar
 import io
 from datetime import datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from fastapi.responses import FileResponse
 
 app = FastAPI()
 
@@ -49,8 +37,6 @@ templates = Jinja2Templates(directory="templates")
 
 connect("appdb", host="mongodb://localhost", port=27020)
 
-
-sessions = {}
 
 MAX_FILE_SIZE = 500 * 1024
 
@@ -265,15 +251,6 @@ def list_user_receipts(
     )
 
 
-class Item(BaseModel):
-    name: str
-    amount: float
-
-
-class ReceiptRequest(BaseModel):
-    user_id: str
-    items: List[Item]
-    purchase_date: str
 
 
 @app.post("/add-expense")
