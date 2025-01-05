@@ -1,14 +1,24 @@
 import re
 from datetime import datetime
+from typing import Dict
 
 import pytesseract
 from PIL import Image
 
 from models.receipt import Receipt
 
+patterns = {
+    "receipt_number": re.compile(r"(?:ID\W+)(\w+)"),
+    "products": re.compile(
+        r"(?P<name>[A-Za-z0-9 ]+)(?:\s+\d+\s+)(?P<price>\d+\.\d+).*"
+    ),
+    "total_amount": re.compile(r"(?:TOTAL\s+)(\d+\.\d+)"),
+    "purchase_date": re.compile(r"(?P<MONTH>\d{2})\/(?P<DAY>\d{2})\/(?P<YEAR>\d{2})"),
+}
+
 
 class ReceiptController:
-    def save_receipt_to_db_from_img(self, receipt_img) -> Receipt:
+    def save_receipt_to_db_from_img(self, receipt_img: str) -> Receipt:
         receipt_data = self._extract_data_from_receipt(receipt_img)
         receipt = Receipt(
             receipt_number=receipt_data["receipt_number"],
@@ -20,7 +30,7 @@ class ReceiptController:
         receipt.save()
         return receipt
 
-    def save_receipt_to_db_from_dict(self, receipt_data) -> Receipt:
+    def save_receipt_to_db_from_dict(self, receipt_data: Dict) -> Receipt:
         receipt = Receipt(
             receipt_number=receipt_data["receipt_number"],
             purchase_date=receipt_data["purchase_date"],
@@ -34,7 +44,7 @@ class ReceiptController:
     def find(self, id) -> Receipt:
         return Receipt.objects(id=id).first()
 
-    def _extract_data_from_receipt(self, image):
+    def _extract_data_from_receipt(self, image: str) -> Dict:
         receipt_text = [
             line.strip()
             for line in pytesseract.image_to_string(Image.open(image))
@@ -42,17 +52,6 @@ class ReceiptController:
             .split("\n")
             if line.strip()
         ]
-
-        patterns = {
-            "receipt_number": re.compile(r"(?:ID\W+)(\w+)"),
-            "products": re.compile(
-                r"(?P<name>[A-Za-z0-9 ]+)(?:\s+\d+\s+)(?P<price>\d+\.\d+).*"
-            ),
-            "total_amount": re.compile(r"(?:TOTAL\s+)(\d+\.\d+)"),
-            "purchase_date": re.compile(
-                r"(?P<MONTH>\d{2})\/(?P<DAY>\d{2})\/(?P<YEAR>\d{2})"
-            ),
-        }
 
         receipt_data = {
             "receipt_number": "",
@@ -85,7 +84,7 @@ class ReceiptController:
         print(receipt_data)
         return receipt_data
 
-    def create_manual_receipt(self, receipt_data):
+    def create_manual_receipt(self, receipt_data: Dict) -> Receipt:
         receipt = Receipt(
             receipt_number=receipt_data["receipt_number"],
             purchase_date=receipt_data["purchase_date"],
@@ -96,6 +95,6 @@ class ReceiptController:
         receipt.save()
         return receipt
 
-    def delete(self, id: str):
+    def delete(self, id: str) -> None:
         receipt = Receipt.objects(id=id).first()
         receipt.delete()

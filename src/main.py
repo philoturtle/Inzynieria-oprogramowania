@@ -1,6 +1,5 @@
 import base64
 import io
-import os
 import random
 from datetime import datetime
 from typing import Annotated
@@ -23,7 +22,6 @@ user_controller = UserController()
 session_controller = SessionController()
 receipt_controller = ReceiptController()
 
-# app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/images", StaticFiles(directory="images"), name="images")
 templates = Jinja2Templates(directory="templates")
 
@@ -35,7 +33,7 @@ MAX_FILE_SIZE = 500 * 1024
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"message": "Projekt Inzynieria Oprogramowania"}
 
 
 @app.post("/login")
@@ -58,8 +56,10 @@ def read_item(id: str):
 
 @app.post("/user/")
 def create_user(username: str, email: str, password: str, full_name: str = ""):
-    user_controller.create(email=email, username=username, full_name=full_name, password=password)
-    return True
+    user = user_controller.create(
+        email=email, username=username, full_name=full_name, password=password
+    )
+    return {"message": f"Succesfully created user", "user_id": user.id}
 
 
 @app.delete("/user/{id}")
@@ -75,7 +75,6 @@ async def upload_image(
     # if not session_controller.is_active(session_id=session_id):
     #     raise HTTPException(status_code=401, detail="Your session is expired.")
     user = session_controller.get_user(session_id)
-    rc = ReceiptController()
 
     file_size = len(await img_file.read())
     img_file.file.seek(0)
@@ -90,18 +89,17 @@ async def upload_image(
         )
     receipt = receipt_controller.save_receipt_to_db_from_img(img_file.file)
     user_controller.link_receipt(user.id, receipt)
-    id = receipt.id
     extension = img_file.filename.split(".")[-1]
 
-    file_save_path = f"./images/{id}.{extension}"
-    if os.path.exists("./images") == False:
-        os.makedirs("./images")
-
+    file_save_path = f"./images/{receipt.id}.{extension}"
     with open(file_save_path, "wb") as f:
         img_file.file.seek(0)
         f.write(img_file.file.read())
 
-    return {"image_path": file_save_path, "message": "Image saved successfully"}
+    return {
+        "message": "Image saved successfully",
+        "receipt_id": receipt.id,
+    }
 
 
 @app.get("/receipt/{id}")
@@ -166,9 +164,6 @@ def list_user_receipts(
         df["Month"] = df["Date"].dt.month
         df["Day"] = df["Date"].dt.day
 
-        # Initialize paths for the plots
-        yearly_plot_path = monthly_plot_path = daily_plot_path = None
-
         # If a year is selected, generate the monthly plot
         if year and not month:
             # Aggregate the total amounts by Month for the year
@@ -187,7 +182,7 @@ def list_user_receipts(
             iobytes = io.BytesIO()
             plt.savefig(iobytes, format="jpg")
             iobytes.seek(0)
-            monthly_plot_path = base64.b64encode(iobytes.read()).decode()
+            monthly_plot = base64.b64encode(iobytes.read()).decode()
             plt.close()
 
         # If a month is selected, generate the daily plot for that month
@@ -210,12 +205,12 @@ def list_user_receipts(
             iobytes = io.BytesIO()
             plt.savefig(iobytes, format="jpg")
             iobytes.seek(0)
-            daily_plot_path = base64.b64encode(iobytes.read()).decode()
+            daily_plot = base64.b64encode(iobytes.read()).decode()
             plt.close()
 
     else:
         # If no receipts, set paths to None
-        yearly_plot_path = monthly_plot_path = daily_plot_path = None
+        yearly_plot = monthly_plot = daily_plot = None
 
     return templates.TemplateResponse(
         "receipts_list.html",
@@ -226,9 +221,9 @@ def list_user_receipts(
             "year": year,
             "month": month,
             "day": day,
-            "yearly_plot": yearly_plot_path,
-            "monthly_plot": monthly_plot_path,
-            "daily_plot": daily_plot_path,
+            "yearly_plot": yearly_plot,
+            "monthly_plot": monthly_plot,
+            "daily_plot": daily_plot,
         },
     )
 
@@ -253,4 +248,4 @@ def add_expense(request: ReceiptRequest):
     new_receipt = receipt_controller.save_receipt_to_db_from_dict(receipt)
     user_controller.link_receipt(user.id, new_receipt)
 
-    return {"message": "Expense added successfully!"}
+    return {"message": "Expense added successfully!", "receipt_id": new_receipt.id}
