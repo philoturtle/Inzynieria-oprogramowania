@@ -131,12 +131,12 @@ Effect: The budget settings have been saved.
 |---------------|-------------------------------|-----------|
 | FastAPI       | Backend API Framework         | 0.88.0    |
 | MongoDB       | NoSQL Database                | 6.0.19    |
-| Pytesseract   | OCR for Receipt Processing    | Latest    |
-| Chart.js      | Frontend Visualizations       | 3.9.1     |
+| Pytesseract   | OCR for Receipt Processing    | 0.3.13    |
 | Docker        | Containerization              | 20.10.8   |
 | Ubuntu        | Hosting Environment           | 20.04 LTS |
-| Mongoengine   | Database engine               |           |
-| VScode        | Code editor                   |           |
+| Mongoengine   | Database engine               | 0.29.1    |
+| Python        | Interpreter                   |      3.11 |
+
 
 
 ---
@@ -144,10 +144,106 @@ Effect: The budget settings have been saved.
 ## 5. Testing
 
 ### **Test Scenarios**
-| ID    | Test Case Name          | Description                                        | Expected Outcome                    |
-|-------|-------------------------|----------------------------------------------------|-------------------------------------|
-| TC-1  | Receipt Upload Test     | Upload a valid receipt image.                      | Receipt details extracted properly. |
-| TC-2  | Invalid File Format     | Upload an invalid file format (e.g., PDF).         | Receive an error message.           |
-| TC-3  | Manual Expense Entry    | Add a manual expense with valid details.           | Expense saved successfully.         |
-| TC-4  | Dashboard Visualization | View the analytics dashboard after filtering.      | Charts display correct data.        |
 
+#### **User Registration Tests**
+1. **Successful Registration** passed :heavy_check_mark:
+   - Test if a new user can register with a unique email address and password.
+   - Expected Outcome: User account is created successfully.
+2. **Duplicate Email Registration**  passed :heavy_check_mark:
+   - Test if the system rejects a registration attempt with an already existing email.
+   - Expected Outcome: Error message is displayed, and registration is blocked.
+3. **Password Validation**  passed :heavy_check_mark:
+   - Test if the system blocks registration when the password does not meet the requirements (e.g., length, digits, special characters).
+   - Expected Outcome: Registration fails with appropriate validation error.
+
+---
+
+#### **User Login Tests**
+4. **Successful Login**  passed :heavy_check_mark:
+   - Test if a user can log in with correct email and password.
+   - Expected Outcome: User is successfully authenticated.
+5. **Failed Login**  not done :x:
+   - Test if the system rejects incorrect login credentials (e.g., wrong email or password).
+   - Expected Outcome: Error message is displayed.
+
+---
+
+#### **Receipt Scanning Tests**
+6. **Valid Receipt Processing**  partially done :x:
+   - Test if the system correctly extracts products, prices, and categories from a clear receipt.
+   - Expected Outcome: Data is accurately extracted and categorized.
+7. **Partially Legible Receipt**  not done :x:
+   - Test if the system handles a partially unreadable receipt (e.g., blurred text).
+   - Expected Outcome: The system processes as much data as possible and highlights errors.
+
+---
+
+#### **Manual Expense Entry Tests**
+8. **Adding a Valid Expense**  passed :heavy_check_mark:
+   - Test if the user can manually add an expense with a valid amount and category.
+   - Expected Outcome: Expense is saved successfully.
+9. **Invalid Data Validation**  not done :x:
+   - Test if the system blocks adding expenses with invalid data (e.g., negative amount or missing category).
+   - Expected Outcome: Error message is displayed, and the expense is not saved.
+
+---
+
+#### **Budget Management Tests**
+10. **Budget Setup**  not done :x:
+    - Test if the user can set up budgets for specific categories.
+    - Expected Outcome: Budgets are saved successfully.
+11. **Budget Limit Warning**  not done :x:
+    - Test if the system sends notifications when a user approaches or exceeds the budget limit.
+    - Expected Outcome: Warning notification is triggered.
+
+---
+
+#### **Data Consistency Tests**
+12. **Receipt Data Consistency**   passed :heavy_check_mark:
+    - Test if the data extracted from a receipt is stored accurately in the database.
+    - Expected Outcome: Data is consistent and correct.
+13. **Category Correction**  not done :x:
+    - Test if the user can manually correct a product's category after an incorrect assignment by the system.
+    - Expected Outcome: Category is updated successfully.
+
+---
+
+#### **Expense Forecasting Tests**
+14. **Accurate Forecasting**  not done :x:
+    - Test if the system generates accurate spending forecasts based on the user's expense history.
+    - Expected Outcome: Forecast aligns with historical data and trends.
+15. **Forecast Updates**  not done :x:
+    - Test if forecasts update correctly when a new expense is added or a budget is modified.
+    - Expected Outcome: Forecasts are recalculated and displayed accurately.
+
+---
+
+#### **Report Generation Tests**
+16. **Financial Report Creation**  not done :x:
+    - Test if the system generates financial reports for a specific time period with correct data.
+    - Expected Outcome: Reports are generated with all expenses categorized correctly.
+17. **Chart Accuracy**  passed :heavy_check_mark:
+    - Test if visualizations (charts) correctly represent expense data.
+    - Expected Outcome: Charts align with the data in the reports.
+
+---
+
+#### **System Performance Tests**
+18. **Receipt Processing Speed**  not done :x:
+    - Test if the system processes and analyzes receipts within 5 seconds, even with a large dataset.
+    - Expected Outcome: Processing time does not exceed 5 seconds.
+19. **High User Load**  not done :x:
+    - Test if the system handles simultaneous logins from many users (e.g., 1,000 users).
+    - Expected Outcome: No performance degradation or crashes.
+
+---
+
+#### **Authentication Security Tests**
+20. **Password Encryption**  passed :heavy_check_mark:
+    - Test if passwords are securely encrypted and stored in the database.
+    - Expected Outcome: Passwords are hashed and not stored in plain text.
+21. **Brute-force Attack Prevention**  not done :x:
+    - Test if the system blocks multiple failed login attempts to prevent brute-force attacks.
+    - Expected Outcome: Account is temporarily locked, and the user is notified.
+
+---
