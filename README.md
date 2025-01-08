@@ -250,4 +250,14 @@ Effect: The budget settings have been saved.
 ---
 
 ## 6. Run
+```bash
+git clone git@github.com:philoturtle/Inzynieria-oprogramowania.git
+cd Inzynieria-oprogramowania
+docker compose up -d
+```
+
+APP api is exposed at localhost:8080
+Mongo express (mongodb web gui) is accessible with http://localhost:8081
+
+
 
