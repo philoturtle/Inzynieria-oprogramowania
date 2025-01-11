@@ -40,13 +40,13 @@ The project is licensed under the MIT License, allowing open use, modification a
 | REQ-2 | Expense Extraction          | Automatically extract expense details from receipts using OCR.              | 1        | Functional        |
 | REQ-3 | Manual Expense Entry        | Enable users to manually add expenses.                                      | 3        | Functional        |
 | REQ-4 | Receipt Filtering           | Filter receipts by year, month, or day.                                     | 2        | Functional        |
-| REQ-5 | Analytics Dashboard         | Display visualizations of expenses grouped by time periods.                 | 4        | Functional        |
+| REQ-5 | Analytics Dashboard         | Display visualizations of expenses grouped by time periods.                 | 3        | Functional        |
 | REQ-6 | User Authentication         | Provide login functionality for secure access.                              | 1        | Functional        |
 | REQ-7 | User Registration           | User can create an account by providing email address and password          | 1        | Functional        |
-| REQ-8 | Notifiactions               | User gets notifications if they are approaching a spending limit of the budget.| 4       | Functional        |
+| REQ-8 | Notifiactions               | User gets notifications if they are approaching a spending limit of the budget.| 3       | Functional        |
 | REQ-9 | Safety                      | User passwords must be stored securely and should be encrypted              | 1        | Non-functional    |
 | REQ-10 | Performance Optimization    | Ensure quick receipt uploads and processing (<3 seconds for OCR).           | 2        | Non-functional    |
-| REQ-11 | Responsive Design           | Ensure compatibility with mobile and desktop browsers.                      | 4        | Non-functional    |
+| REQ-11 | Responsive Design           | Ensure compatibility with mobile and desktop browsers.                      | 3        | Non-functional    |
 | REQ-12 | Efficiency                 | The application should support up to 1000 active users simultaneously without noticeable lag.| 4        | Non-functional    |
 
 
