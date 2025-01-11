@@ -9,20 +9,17 @@ services:
       #   target: /app
       - type: volume
         source: images
-        target: /workspace/images
+        target: /app/images
     restart: always
     depends_on:
       - mongo
 
   mongo:
     image: mongodb/mongodb-community-server:6.0.19-ubuntu2204
-    command: --bind_ip=0.0.0.0
     environment:
       MONGO_INITDB_DATABASE: appdb
       MONGO_INITDB_ROOT_USERNAME: root 
       MONGO_INITDB_ROOT_PASSWORD: pass 
-    ports:
-      - 27017:27017
     volumes:
       - type: volume
         source: dbdata
